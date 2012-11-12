@@ -1,0 +1,8 @@
+Some simple scripts for controlling VirtualBox VMs.
+
+* vmlist  - list the VMs available
+* vmrun   - list the running VMs
+* vmstart - start a VM
+* vmstop  - stop a running VM
+
+You'll need to have Zenity (https://live.gnome.org/Zenity) installed.
