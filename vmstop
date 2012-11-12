@@ -1,0 +1,21 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use 5.010;
+
+if (@ARGV) {
+  foreach (@ARGV) {
+    poweroff($_);
+  }
+} else {
+  foreach (`vmrun`) {
+    chomp;
+    poweroff($_);
+  }
+}
+
+sub poweroff {
+  say "Powering down $_[0]";
+  print `vboxmanage controlvm $_[0] poweroff`;
+}

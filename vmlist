@@ -1,0 +1,65 @@
+#!/usr/bin/perl
+
+use warnings;
+use strict;
+use 5.010;
+
+use Getopt::Std;
+use File::Basename;
+
+my $me = basename $0;
+
+my %option = (
+  vmlist => {
+    cmd => 'vboxmanage list vms',
+    txt => 'Configured VMs',
+    err => 'No VMs configured',
+  },
+  vmrun  => {
+    cmd => 'vboxmanage list runningvms',
+    txt => 'Running VMs',
+    err => 'No VMs running',
+  }
+);
+
+$option{$me} or die "Unknown command: $me\n";
+
+my %opts;
+getopts('vt', \%opts);
+
+my $re;
+if (@ARGV) {
+  $re = qr[$ARGV[0]];
+}
+
+my @vms;
+foreach (`$option{$me}{cmd}`) {
+  if (my($name, $id) = /"(.*)"\s+{(.*)}/) {
+    if ($re) {
+      next unless $name =~ $re;
+    }
+    if ($opts{v}) {
+      push @vms, "$name [$id]";
+    } else {
+      push @vms, $name;
+    }
+  }
+}
+
+if ($opts{t}) {
+  say join "\n", @vms;
+  exit;
+}
+
+my $add = @ARGV ? qq[ matching "$ARGV[0]"] : '';
+
+unless (@vms) {
+  my $msg = $option{$me}{err};
+  $msg .= $add if @ARGV;
+  system("zenity --title $me --info --text='$msg'");
+  exit;
+}
+
+my $msg = $option{$me}{txt};
+$msg .= $add if @ARGV;
+system("zenity --title $me --list --text='$msg' --column VMs @vms");

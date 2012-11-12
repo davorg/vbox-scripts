@@ -1,0 +1,17 @@
+#!/bin/bash
+
+if [ -z "$1" ]
+then
+  vm=`zenity --list --title=vmstart --radiolist --text 'Choose a VM to start' --column ' ' --column VM $(perl -E 'say map { chomp; "FALSE $_ " } qx[vmlist -t]')`
+else
+  vm=$1
+fi
+
+if [ -z "$vm" ]
+then
+  echo "No VM chosen"
+  exit
+fi
+
+echo "Starting $vm..."
+vboxmanage startvm $vm --type=headless
